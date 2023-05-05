@@ -11,7 +11,7 @@ Future<List<Product>> fetchProducts() async {
   final response =
       await http.get(Uri.parse('http://localhost:8081/api/products'));
 
-  if (response.body != null) {
+  if (response.statusCode == 200) {
     List<Product> products = (json.decode(response.body) as List)
         .map((data) => Product.fromJson(data))
         .toList();
@@ -192,69 +192,75 @@ class ProductDetails extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var appState = context.watch<MyAppState>();
-    return Scaffold(
-        appBar: AppBar(
-          title: Text('${product.productName} details'),
-          actions: [
-            Padding(
-              padding: const EdgeInsets.fromLTRB(0, 0, 10.0, 0),
-              child: IconButton(
-                  onPressed: () {
-                    appState.showItemDetails(null);
-                  },
-                  icon: const Icon(Icons.arrow_back_ios_new_rounded)),
-            )
-          ],
-        ),
-        body: Container(
-          color: Theme.of(context).colorScheme.primaryContainer,
-          padding: const EdgeInsets.all(10.0),
-          child: Card(
-            child: Padding(
-              padding: const EdgeInsets.all(10.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: <Widget>[
-                  Padding(
-                    padding: EdgeInsets.all(descriptionPadding),
-                    child: Text(
-                      product.productName,
-                      style: const TextStyle(
-                          fontSize: 32, fontWeight: FontWeight.bold),
+    return WillPopScope(
+      onWillPop: () async {
+        appState.showItemDetails(null);
+        return false;
+      },
+      child: Scaffold(
+          appBar: AppBar(
+            title: Text('${product.productName} details'),
+            actions: [
+              Padding(
+                padding: const EdgeInsets.fromLTRB(0, 0, 10.0, 0),
+                child: IconButton(
+                    onPressed: () {
+                      appState.showItemDetails(null);
+                    },
+                    icon: const Icon(Icons.arrow_back_ios_new_rounded)),
+              )
+            ],
+          ),
+          body: Container(
+            color: Theme.of(context).colorScheme.primaryContainer,
+            padding: const EdgeInsets.all(10.0),
+            child: Card(
+              child: Padding(
+                padding: const EdgeInsets.all(10.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: <Widget>[
+                    Padding(
+                      padding: EdgeInsets.all(descriptionPadding),
+                      child: Text(
+                        product.productName,
+                        style: const TextStyle(
+                            fontSize: 32, fontWeight: FontWeight.bold),
+                      ),
                     ),
-                  ),
-                  Padding(
-                    padding: EdgeInsets.all(descriptionPadding),
-                    child: Text(
-                      'Price: ${product.price} \$',
-                      style: descriptionStyle,
+                    Padding(
+                      padding: EdgeInsets.all(descriptionPadding),
+                      child: Text(
+                        'Price: ${product.price} \$',
+                        style: descriptionStyle,
+                      ),
                     ),
-                  ),
-                  Padding(
-                    padding: EdgeInsets.all(descriptionPadding),
-                    child: Text(
-                      'Category: ${product.category}',
-                      style: descriptionStyle,
+                    Padding(
+                      padding: EdgeInsets.all(descriptionPadding),
+                      child: Text(
+                        'Category: ${product.category}',
+                        style: descriptionStyle,
+                      ),
                     ),
-                  ),
-                  Padding(
-                    padding: EdgeInsets.all(descriptionPadding),
-                    child: Text(
-                      'Country of origin: ${product.countryOfOrigin ?? ''}',
-                      style: descriptionStyle,
+                    Padding(
+                      padding: EdgeInsets.all(descriptionPadding),
+                      child: Text(
+                        'Country of origin: ${product.countryOfOrigin ?? ''}',
+                        style: descriptionStyle,
+                      ),
                     ),
-                  ),
-                  Padding(
-                    padding: EdgeInsets.all(descriptionPadding),
-                    child: Text(
-                      'Available: ${product.available ? 'yes' : 'no'}',
-                      style: descriptionStyle,
+                    Padding(
+                      padding: EdgeInsets.all(descriptionPadding),
+                      child: Text(
+                        'Available: ${product.available ? 'yes' : 'no'}',
+                        style: descriptionStyle,
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
-          ),
-        ));
+          )),
+    );
   }
 }
